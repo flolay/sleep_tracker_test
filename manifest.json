@@ -1,0 +1,17 @@
+{
+  "name": "Sleep Analyzer",
+  "short_name": "Sleep",
+  "description": "Track your child's sleep and predict when they'll be tired next",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f0c29",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

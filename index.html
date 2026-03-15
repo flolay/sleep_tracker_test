@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="description" content="Track your child's sleep and predict when they'll be tired next">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <title>Sleep Analyzer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- SETUP VIEW -->
+    <section id="view-setup" class="view" hidden>
+      <div class="setup-container">
+        <div class="logo">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <path d="M48 32c0-11-9-20-20-20a20 20 0 0 0-4 .4A16 16 0 0 1 40 28a16 16 0 0 1-15.6 16A20 20 0 0 0 48 32Z" fill="currentColor" opacity="0.9"/>
+            <circle cx="42" cy="14" r="2" fill="currentColor" opacity="0.6"/>
+            <circle cx="50" cy="22" r="1.5" fill="currentColor" opacity="0.4"/>
+            <circle cx="46" cy="8" r="1" fill="currentColor" opacity="0.3"/>
+          </svg>
+        </div>
+        <h1>Sleep Analyzer</h1>
+        <p class="subtitle">Track your little one's sleep</p>
+        <form id="setup-form" class="card">
+          <div class="form-group">
+            <label for="child-name">Child's name</label>
+            <input type="text" id="child-name" placeholder="Optional" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="birth-date">Date of birth <span class="required">*</span></label>
+            <input type="date" id="birth-date" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Get Started</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view" hidden>
+      <header class="top-bar">
+        <div>
+          <h2 id="child-display-name">Baby</h2>
+          <span id="child-age" class="age-badge"></span>
+        </div>
+        <button id="btn-settings" class="btn-icon" aria-label="Settings">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Prediction Card -->
+      <div id="prediction-card" class="card prediction-card">
+        <div id="prediction-content">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="action-area">
+        <button id="btn-sleep-toggle" class="btn btn-action">
+          <span id="btn-sleep-label">Fell Asleep</span>
+        </button>
+      </div>
+
+      <!-- Wake Window Info -->
+      <div id="wake-window-info" class="card info-card">
+        <div class="info-row">
+          <span class="info-label">Wake window</span>
+          <span id="wake-window-range" class="info-value"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Recommended naps</span>
+          <span id="nap-count" class="info-value"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Total sleep needed</span>
+          <span id="total-sleep" class="info-value"></span>
+        </div>
+      </div>
+
+      <!-- Today's Log -->
+      <div class="section-header">
+        <h3>Today</h3>
+        <button id="btn-history" class="btn-link">History</button>
+      </div>
+      <div id="today-log" class="card log-card">
+        <p class="empty-state">No sleep logged today</p>
+      </div>
+    </section>
+
+    <!-- HISTORY VIEW -->
+    <section id="view-history" class="view" hidden>
+      <header class="top-bar">
+        <button id="btn-back-history" class="btn-icon" aria-label="Back">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <h2>Sleep History</h2>
+        <div style="width:40px"></div>
+      </header>
+      <div id="history-content">
+        <p class="empty-state">No sleep data yet</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section id="view-settings" class="view" hidden>
+      <header class="top-bar">
+        <button id="btn-back-settings" class="btn-icon" aria-label="Back">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <h2>Settings</h2>
+        <div style="width:40px"></div>
+      </header>
+      <div class="settings-content">
+        <form id="settings-form" class="card">
+          <div class="form-group">
+            <label for="settings-name">Child's name</label>
+            <input type="text" id="settings-name" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="settings-birthdate">Date of birth</label>
+            <input type="date" id="settings-birthdate" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+
+        <div class="card info-card">
+          <h4>Wake Windows Reference</h4>
+          <table class="ref-table">
+            <thead><tr><th>Age</th><th>Wake Window</th><th>Naps</th></tr></thead>
+            <tbody>
+              <tr><td>0–4 wks</td><td>30–60 min</td><td>4–5</td></tr>
+              <tr><td>4–12 wks</td><td>60–90 min</td><td>4–5</td></tr>
+              <tr><td>3–4 mo</td><td>75–120 min</td><td>3–4</td></tr>
+              <tr><td>5–7 mo</td><td>2–3 hrs</td><td>2–3</td></tr>
+              <tr><td>7–10 mo</td><td>2.5–3.5 hrs</td><td>2–3</td></tr>
+              <tr><td>10–14 mo</td><td>3–4 hrs</td><td>1–2</td></tr>
+              <tr><td>14–24 mo</td><td>4–6 hrs</td><td>1</td></tr>
+              <tr><td>2–3 yrs</td><td>5.5–6.5 hrs</td><td>0–1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button id="btn-clear-data" class="btn btn-danger">Clear All Data</button>
+      </div>
+    </section>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
