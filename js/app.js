@@ -2,6 +2,7 @@ import { getWakeWindow } from './data.js';
 import { getProfile, saveProfile, getEntries, addEntry, updateEntry, deleteEntry, getOpenEntry, clearAll } from './store.js';
 import { predictNextTired } from './prediction.js';
 import { ageFromBirthDate, formatTime, formatDuration, formatMinutes, isNightSleep, isToday, startOfDay, formatDate } from './utils.js';
+import { checkAndNotify, requestPermission, isEnabled, setEnabled } from './notifications.js';
 
 // --- DOM References ---
 const views = {
@@ -83,6 +84,7 @@ function updatePrediction() {
   const profile = getProfile();
   const entries = getEntries();
   const prediction = predictNextTired(profile, entries);
+  checkAndNotify(prediction, profile.childName);
   const container = document.getElementById('prediction-content');
 
   if (prediction.status === 'no_data' || prediction.status === 'no_entries') {
@@ -322,6 +324,23 @@ document.getElementById('btn-settings').addEventListener('click', () => {
   if (profile) {
     document.getElementById('settings-name').value = profile.childName || '';
     document.getElementById('settings-birthdate').value = profile.birthDate || '';
+  }
+  document.getElementById('toggle-notifications').checked = isEnabled();
+});
+
+document.getElementById('toggle-notifications').addEventListener('change', async (e) => {
+  if (e.target.checked) {
+    const granted = await requestPermission();
+    if (!granted) {
+      e.target.checked = false;
+      showToast('Notification permission denied');
+      return;
+    }
+    setEnabled(true);
+    showToast('Nap reminders enabled');
+  } else {
+    setEnabled(false);
+    showToast('Nap reminders disabled');
   }
 });
 

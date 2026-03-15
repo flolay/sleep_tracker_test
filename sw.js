@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sleep-analyzer-v1';
+const CACHE_NAME = 'sleep-analyzer-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS = [
   './js/store.js',
   './js/prediction.js',
   './js/utils.js',
+  './js/notifications.js',
   './assets/favicon.svg',
 ];
 
@@ -25,6 +26,18 @@ self.addEventListener('activate', (event) => {
     )
   );
   self.clients.claim();
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window' }).then((clients) => {
+      if (clients.length > 0) {
+        return clients[0].focus();
+      }
+      return self.clients.openWindow('./');
+    })
+  );
 });
 
 self.addEventListener('fetch', (event) => {
