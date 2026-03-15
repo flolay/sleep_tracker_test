@@ -10,6 +10,7 @@ const views = {
   dashboard: document.getElementById('view-dashboard'),
   history: document.getElementById('view-history'),
   settings: document.getElementById('view-settings'),
+  draw: document.getElementById('view-draw'),
 };
 
 let updateInterval = null;
@@ -378,6 +379,90 @@ document.getElementById('btn-clear-data').addEventListener('click', () => {
     showToast('All data cleared');
   }
 });
+
+// --- Draw View ---
+document.getElementById('btn-draw').addEventListener('click', () => {
+  showView('draw');
+  initCanvas();
+});
+
+document.getElementById('btn-back-draw').addEventListener('click', showDashboard);
+
+function initCanvas() {
+  const canvas = document.getElementById('draw-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Set canvas resolution to match display size
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  let drawing = false;
+  let strokeColor = '#f0f0f5';
+  let strokeWidth = 2;
+
+  // Remove old listeners by replacing the canvas node
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
+  const newCtx = newCanvas.getContext('2d');
+  newCtx.scale(dpr, dpr);
+  newCanvas.width = canvas.width;
+  newCanvas.height = canvas.height;
+
+  function getPos(e) {
+    const r = newCanvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  newCanvas.addEventListener('pointerdown', (e) => {
+    drawing = true;
+    const pos = getPos(e);
+    newCtx.beginPath();
+    newCtx.moveTo(pos.x, pos.y);
+    newCanvas.setPointerCapture(e.pointerId);
+  });
+
+  newCanvas.addEventListener('pointermove', (e) => {
+    if (!drawing) return;
+    const pos = getPos(e);
+    newCtx.lineWidth = strokeWidth;
+    newCtx.strokeStyle = strokeColor;
+    newCtx.lineCap = 'round';
+    newCtx.lineJoin = 'round';
+    newCtx.lineTo(pos.x, pos.y);
+    newCtx.stroke();
+    newCtx.beginPath();
+    newCtx.moveTo(pos.x, pos.y);
+  });
+
+  newCanvas.addEventListener('pointerup', () => { drawing = false; });
+  newCanvas.addEventListener('pointerleave', () => { drawing = false; });
+
+  // Color swatches
+  document.querySelectorAll('.color-swatch').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      strokeColor = btn.dataset.color;
+    });
+  });
+
+  // Size buttons
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      strokeWidth = Number(btn.dataset.size);
+    });
+  });
+
+  // Clear
+  document.getElementById('btn-clear-canvas').addEventListener('click', () => {
+    newCtx.clearRect(0, 0, newCanvas.width, newCanvas.height);
+  });
+}
 
 // --- Init ---
 function init() {
