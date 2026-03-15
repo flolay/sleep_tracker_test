@@ -46,6 +46,10 @@ export function checkAndNotify(prediction, childName) {
   }
 }
 
+export function sendTestNotification() {
+  sendNotification('Test notification', 'Nap reminders are working!');
+}
+
 function sendNotification(title, body) {
   try {
     const n = new Notification(title, {

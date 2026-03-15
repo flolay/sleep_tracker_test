@@ -2,7 +2,7 @@ import { getWakeWindow } from './data.js';
 import { getProfile, saveProfile, getEntries, addEntry, updateEntry, deleteEntry, getOpenEntry, clearAll } from './store.js';
 import { predictNextTired } from './prediction.js';
 import { ageFromBirthDate, formatTime, formatDuration, formatMinutes, isNightSleep, isToday, startOfDay, formatDate } from './utils.js';
-import { checkAndNotify, requestPermission, isEnabled, setEnabled } from './notifications.js';
+import { checkAndNotify, requestPermission, isEnabled, setEnabled, sendTestNotification } from './notifications.js';
 
 // --- DOM References ---
 const views = {
@@ -342,6 +342,20 @@ document.getElementById('toggle-notifications').addEventListener('change', async
     setEnabled(false);
     showToast('Nap reminders disabled');
   }
+});
+
+document.getElementById('btn-test-notification').addEventListener('click', async () => {
+  if (!isEnabled()) {
+    const granted = await requestPermission();
+    if (!granted) {
+      showToast('Notification permission denied');
+      return;
+    }
+    setEnabled(true);
+    document.getElementById('toggle-notifications').checked = true;
+  }
+  sendTestNotification();
+  showToast('Test notification sent');
 });
 
 document.getElementById('btn-back-settings').addEventListener('click', showDashboard);
